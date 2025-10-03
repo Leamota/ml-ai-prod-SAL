@@ -4,8 +4,6 @@ This repository is your starting point for the ML & AI in Production term projec
 You will deploy a FastAPI recommender, ingest Kafka events, run CI/CD, monitor SLOs,
 and iterate models.
 
----
-
 ## Team Information
 **Team Name:** SAL - Team  
 
@@ -14,12 +12,8 @@ and iterate models.
 - **Saika Zaman** – ML Lead  
 - **Lawrence Egharevba** – Data/Streaming Lead  
 
----
-
 ## Submission Note
 **Milestone 1 – Contract & Proposal (Canvas submission)**
-
----
 
 ## Quickstart
 1. **Python setup**
