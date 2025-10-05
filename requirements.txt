@@ -9,3 +9,8 @@ python-dotenv
 scikit-learn
 numpy
 pytest
+pandas
+numpy
+scikit-learn
+scipy
+surprise
