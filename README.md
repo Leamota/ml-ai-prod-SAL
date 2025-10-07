@@ -1,55 +1,62 @@
-# Cloud-Native Recommender (Starter)
+# Cloud-Native Movie Recommender – Team SAL  
 
-This repository is your starting point for the ML & AI in Production term project.
-You will deploy a FastAPI recommender, ingest Kafka events, run CI/CD, monitor SLOs,
-and iterate models.
+**Course:** ML & AI in Production  
+**Milestone 1:** Team Formation, Contract & Technical Proposal  
+**Due:** October 6, 2025 @ 11:59 PM  
+
+---
 
 ## Team Information
-**Team Name:** SAL - Team  
 
-**Members:**
-- **Ayah Jaber** – PM/Delivery + DevOps  
-- **Saika Zaman** – ML Lead  
-- **Lawrence Egharevba** – Data/Streaming Lead  
+**Team Name:** Team SAL  
+**GitHub Repo:** [https://github.com/ayahjaber7/ml-ai-prod-SLA](https://github.com/ayahjaber7/ml-ai-prod-SLA)
 
-## Submission Note
-**Milestone 1 – Contract & Proposal (Canvas submission)**
+| Name | Role | Focus Area | Summary |
+|------|------|-------------|----------|
+| **Ayah Jaber** | PM / Delivery Lead & DevOps Lead (Backup ML Lead) | CI/CD, Cloud Deploy, SRE | B.S. in Computer Science (Cybersecurity & AI minors), M.S. in AI in progress. Software QA Engineer in healthcare tech. Interested in AI for humanitarian aid. |
+| **Saika Zaman** | ML Lead (Backup Data/Streaming & DevOps) | Modeling & Evaluation | B.S. and M.S. in Computer Science; Ph.D. candidate in AI/ML. Research focus on Federated Learning and Machine Intelligence. |
+| **Lawrence Egharevba** | Data/Streaming Lead (Backup PM & DevOps) | Kafka / ETL Pipelines | B.S. in Computer Engineering, M.S. in AI in progress. Interested in scalable AI and ML applications across domains. |
 
-## Quickstart
-1. **Python setup**
-   ```bash
-   python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-2. **Environment**
-   - Copy `.env.example` → `.env` and set values.
-   - Copy `infra/kafka.env.example` → `infra/kafka.env` and set Kafka credentials.
-3. **Run API locally**
-   ```bash
-   uvicorn service.app:app --reload --port 8080
-   curl http://localhost:8080/healthz
-   ```
-4. **Docker build**
-   ```bash
-   docker build -f docker/recommender.Dockerfile -t reco-api:dev .
-   docker run -p 8080:8080 --env-file .env reco-api:dev
-   ```
-5. **Kafka sanity (kcat)**
-   ```bash
-   # example (adjust flags for your cluster)
-   kcat -b $BOOTSTRAP -X security.protocol=SASL_SSL -X sasl.mechanisms=PLAIN         -X sasl.username=$API_KEY -X sasl.password=$API_SECRET         -t $TEAM.watch -C -o -5 -q
-   ```
-6. **CI/CD** (GitHub Actions)
-   - Push to main → CI runs tests, builds/pushes image, CD deploys to cloud.
+---
 
-## Endpoints
-- `GET /healthz` → `{ "status": "ok", "version": "vX.Y" }`
-- `GET /recommend/{user_id}?k=20&model=A` → comma-separated movie IDs
-- `GET /metrics` → Prometheus exposition
+## Project Overview
 
-## Project Structure
-See repo tree; update components as you progress through milestones.
+This project implements a **cloud-native movie recommendation system** using the **MovieLens dataset** and **Kafka streaming** for real-time personalization.  
+The model employs **collaborative filtering (KNN, SVD)** to predict user–item preferences and serves recommendations through a **FastAPI microservice** deployed on **Google Cloud Run**.
 
-## Secrets & Safety
-- Use **GitHub Environments/Secrets**. Never commit secrets. Rotate if leaked.
-- Follow your team contract’s Definition of Done. Lint and tests must pass before merge.
+**Goal:** Deliver real-time, scalable, and monitored recommendations that maintain reliability, low latency, and data consistency.
+
+**Service-Level Objectives (SLOs):**
+- **Latency (p95):** ≤ 400 ms  
+- **Uptime:** ≥ 99.5 %  
+- **Accuracy:** ≥ baseline F1 score  
+
+---
+
+## Architecture Summary
+
+**Core Components:**
+- **FastAPI Service** – Serves `/recommend`, `/healthz`, and `/metrics` endpoints.  
+- **Kafka Topics** – Handle user activity and rating streams.  
+- **Schema Registry** – Maintains data schema consistency.  
+- **Model Service** – Generates predictions using stored model versions.  
+- **GCS Storage** – Persists datasets, model artifacts, and logs.  
+- **CI/CD Pipeline** – GitHub Actions for test → build → push → deploy.  
+- **Monitoring Stack** – Prometheus + Grafana Cloud dashboards.  
+
+![System Architecture Diagram](docs/architecture_diagram.png)
+
+
+Figure 1 – System Architecture Diagram
+
+---
+
+## Repository Hygiene Notes
+- `.gitignore` excludes environment files, logs, caches  
+- `requirements.txt` includes pinned package versions  
+- CI/CD pipeline configured for automated deploys  
+- Secrets managed via GitHub Environments and Google Secret Manager  
+
+---
+
+**Maintained by:** Team SAL (2025 Fall – ML & AI in Production)
