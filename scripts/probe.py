@@ -1,12 +1,9 @@
-import os, time, requests, random
+import requests, time, random
 
-API = os.environ.get('RECO_API', 'http://localhost:8080')
-def main():
-    user = random.randint(1, 1000)
-    try:
-        r = requests.get(f"{API}/recommend/{user}", timeout=5)
-        print("status:", r.status_code, "body:", r.text[:100])
-    except Exception as e:
-        print("probe error:", e)
-if __name__ == '__main__':
-    main()
+API_URL = "http://localhost:8080"  # Replace with your live URL later
+
+while True:
+    user_id = random.randint(1, 100)
+    res = requests.get(f"{API_URL}/recommend/{user_id}")
+    print(f"Probe for user {user_id}: {res.status_code} - {res.json()}")
+    time.sleep(60)  # every 1 minute

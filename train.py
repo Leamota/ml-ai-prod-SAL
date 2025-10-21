@@ -1,33 +1,35 @@
+# train.py
 import pandas as pd
-from surprise import Dataset, Reader, KNNBasic, SVD
-from surprise.model_selection import train_test_split, cross_validate, accuracy
+from surprise import Dataset, Reader, SVD
+from surprise.model_selection import train_test_split, accuracy
 
-# Load MovieLens data (replace with path to ml-latest-small/ratings.csv if local)
-ratings = pd.read_csv("data/ratings.csv")
+# Load MovieLens data
+ratings = pd.read_csv("data/ratings.csv")  # make sure this file exists
 
-# Use Surprise Reader
+# Model 1: Popularity-based (most watched movies)
+popularity = ratings.groupby('movieId')['rating'].count().sort_values(ascending=False)
+top_movies = popularity.head(10)
+print("Top 10 popular movies by count:\n", top_movies)
+
+# Model 2: SVD (Collaborative Filtering)
 reader = Reader(rating_scale=(0.5, 5))
 data = Dataset.load_from_df(ratings[['userId', 'movieId', 'rating']], reader)
+trainset, testset = train_test_split(data, test_size=0.2, random_state=42)
 
-# Train/test split
-trainset, testset = train_test_split(data, test_size=0.2)
+svd = SVD()
+svd.fit(trainset)
+predictions = svd.test(testset)
 
-# --- Baseline Model (User-based KNN) ---
-sim_options = {"name": "cosine", "user_based": True}
-knn_model = KNNBasic(sim_options=sim_options)
-knn_model.fit(trainset)
+# Evaluate
+rmse = accuracy.rmse(predictions)
+mae = accuracy.mae(predictions)
 
-predictions = knn_model.test(testset)
+print(f"\nSVD Model Results: RMSE={rmse:.3f}, MAE={mae:.3f}")
 
-print("KNN Model Performance:")
-accuracy.rmse(predictions)
-accuracy.mae(predictions)
+# Save summary
+with open("docs/model_comparison.txt", "w") as f:
+    f.write("Model Comparison:\n")
+    f.write("1. Popularity-Based (simple ranking)\n")
+    f.write(f"2. SVD: RMSE={rmse:.3f}, MAE={mae:.3f}\n")
 
-# --- Stronger Model (SVD Matrix Factorization) ---
-svd_model = SVD()
-svd_model.fit(trainset)
-predictions_svd = svd_model.test(testset)
-
-print("\nSVD Model Performance:")
-accuracy.rmse(predictions_svd)
-accuracy.mae(predictions_svd)
+print("\nModel comparison saved to docs/model_comparison.txt")
