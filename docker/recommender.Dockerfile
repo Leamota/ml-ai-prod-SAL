@@ -32,5 +32,5 @@ COPY model_registry/ model_registry/
 ENV PORT=8080
 EXPOSE 8080
 
-# Launch FastAPI via Uvicorn
-CMD ["uvicorn", "service.app:app", "--host", "0.0.0.0", "--port", "8080"]
+# Launch FastAPI via Uvicorn (start api_service.py)
+CMD ["uvicorn", "service.api_service:app", "--host", "0.0.0.0", "--port", "8080"]
