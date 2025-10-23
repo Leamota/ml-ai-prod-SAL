@@ -1,19 +1,25 @@
 import os, time
 from confluent_kafka import Consumer
+from dotenv import load_dotenv
+load_dotenv()
+from .snapshot_writer import write_snapshot
+from .redis_cache import cache_record
+import json
+
 
 conf = {
-  'bootstrap.servers': os.environ.get('KAFKA_BOOTSTRAP'),
-  'security.protocol': 'SASL_SSL',
-  'sasl.mechanisms': 'PLAIN',
-  'sasl.username': os.environ.get('KAFKA_API_KEY'),
-  'sasl.password': os.environ.get('KAFKA_API_SECRET'),
-  'group.id': os.environ.get('KAFKA_GROUP','ingestor'),
+  'bootstrap.servers': os.getenv('KAFKA_BOOTSTRAP'),
+  'security.protocol': os.getenv('KAFKA_SECURITY_PROTOCOL','SASL_SSL'),
+  'sasl.mechanisms': os.getenv('KAFKA_SASL_MECHANISM','PLAIN'),
+  'sasl.username': os.getenv('KAFKA_API_KEY'),
+  'sasl.password': os.getenv('KAFKA_API_SECRET'),
+  'group.id': os.getenv('KAFKA_GROUP','ingestor'),
   'auto.offset.reset': 'earliest'
 }
 
 def main():
-    watch = os.environ.get('WATCH_TOPIC','myteam.watch')
-    rate = os.environ.get('RATE_TOPIC','myteam.rate')
+    watch = os.environ.get('WATCH_TOPIC','sal.watch')
+    rate = os.environ.get('RATE_TOPIC','sal.rate')
     topics = [watch, rate]
     c = Consumer(conf)
     c.subscribe(topics)

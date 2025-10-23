@@ -13,4 +13,7 @@ pandas
 numpy
 scikit-learn
 scipy
-surprise
+boto3
+redis
+
+
