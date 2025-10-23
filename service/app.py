@@ -1,6 +1,13 @@
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from datetime import datetime
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import os
+
+class RecommendationRequest(BaseModel):
+    user_id: int
+    timestamp: datetime
+
 
 app = FastAPI()
 reqs = Counter('recommend_requests_total','requests',['status'])
@@ -20,6 +27,19 @@ def recommend(user_id: int, k: int = 20, model: str | None = None):
     except Exception as e:
         reqs.labels('500').inc()
         raise HTTPException(500, str(e))
+
+@app.post('/recommend')
+@lat.time()
+def recommend_post(data: RecommendationRequest):
+    try:
+        ids = [50, 172, 1]  # TODO: replace with real inference
+        reqs.labels('200').inc()
+        return {"user_id": data.user_id, "items": ','.join(map(str, ids))}
+    except Exception as e:
+        reqs.labels('500').inc()
+        raise HTTPException(500, str(e))
+
+
 
 @app.get('/metrics')
 def metrics():
