@@ -1,0 +1,46 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:     # <-- CI jobs
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: pytest --cov=pipeline --cov-report=xml
+      - run: flake8 pipeline tests
+      - run: black --check pipeline tests
+      - name: Build Docker
+        run: docker build -f docker/recommender.Dockerfile -t us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:v14 .
+      - name: Login to Artifact Registry
+        run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
+      - name: Push Docker image
+        run: docker push us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:v14
+
+  deploy:      # <-- CD jobs
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with GCP
+        run: |
+          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
+          gcloud auth activate-service-account --key-file=key.json
+          gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
+          gcloud config set run/region ${{ secrets.GCLOUD_REGION }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy recommender-api \
+            --image=us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:v14 \
+            --region=us-central1 \
+            --allow-unauthenticated \
+            --platform managed \
+            --quiet
