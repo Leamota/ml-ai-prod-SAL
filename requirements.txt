@@ -8,9 +8,9 @@ confluent-kafka
 python-dotenv
 scikit-learn
 numpy
-pytest
-pandas
-numpy
-scikit-learn
 scipy
 surprise
+pytest
+pytest-cov
+flake8
+black
