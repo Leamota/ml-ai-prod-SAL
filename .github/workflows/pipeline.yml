@@ -16,7 +16,8 @@ jobs:     # <-- CI jobs
           python-version: '3.11'
       - run: pip install -r requirements.txt
       - run: pytest --cov=pipeline --cov-report=xml
-      - run: flake8 pipeline tests
+      - run: flake8 scripts tests service recommender
+
       - run: black --check pipeline tests
       - name: Build Docker
         run: docker build -f docker/recommender.Dockerfile -t us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:v14 .
