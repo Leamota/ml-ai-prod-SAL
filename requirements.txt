@@ -15,5 +15,7 @@ scikit-learn
 scipy
 boto3
 redis
+pytest-cov
+
 
 
