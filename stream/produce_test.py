@@ -1,10 +1,10 @@
 from confluent_kafka import Producer
 from datetime import datetime
 from dotenv import load_dotenv
-load_dotenv()
 import json
 import os
 
+load_dotenv()  # ✅ moved below all imports
 
 conf = {
     'bootstrap.servers': 'pkc-921jm.us-east-2.aws.confluent.cloud:9092',
@@ -12,7 +12,6 @@ conf = {
     'sasl.mechanisms': 'PLAIN',
     'sasl.username': os.getenv('KAFKA_API_KEY'),
     'sasl.password': os.getenv('KAFKA_API_SECRET'),
-
 }
 
 p = Producer(conf)
@@ -33,5 +32,3 @@ print("Sending payload:", json.dumps(payload))
 
 p.produce('sal.watch', key='test123', value=json.dumps(payload), callback=delivery_report)
 p.flush()
-
-
