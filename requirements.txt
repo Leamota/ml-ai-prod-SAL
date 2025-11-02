@@ -6,10 +6,15 @@ pandas
 pyarrow
 confluent-kafka
 python-dotenv
-scikit-learn
-numpy
+
+# Machine learning & math libraries
+numpy<2
 scipy
+scikit-learn
 surprise
+scikit-surprise
+
+# Testing & linting
 pytest
 pytest-cov
 flake8
