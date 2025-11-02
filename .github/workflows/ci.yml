@@ -24,7 +24,7 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest --maxfail=1 --disable-warnings --cov=. --cov-report=term-missing
+          pytest --cov=. --cov-report=xml --cov-report=term-missing
 
       - name: Build Docker image
         run: docker build -f docker/recommender.Dockerfile -t ghcr.io/${{ github.repository }}/reco:${{ github.sha }} .
