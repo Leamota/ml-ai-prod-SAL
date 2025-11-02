@@ -15,6 +15,9 @@ jobs:     # <-- CI jobs
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
+      - name: Sanity check pytest plugins
+      - run: pytest --version
+
       - run: pytest --cov=pipeline --cov-report=xml
       - run: flake8 pipeline tests
       - run: black --check pipeline tests
