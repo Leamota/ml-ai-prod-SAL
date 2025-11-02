@@ -1,15 +1,24 @@
 name: CD
+
 on:
   workflow_run:
     workflows: ["CI"]
-    types: ["completed"]
-    branches: ["main"]
+    types: [completed]
+    branches: [main]
+
 jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: echo "Starting deployment process..."
+
       - name: Deploy
         run: |
-          echo "Replace with cloud deploy: gcloud run deploy / az containerapp update / aws ecs update-service"
+          echo "✅ CI passed successfully — ready to deploy."
+          echo "🚀 Replace the command below with your real deployment script:"
+          echo "gcloud run deploy my-service --image ghcr.io/${{ github.repository }}/reco:${{ github.sha }} --region=us-central1"
