@@ -35,3 +35,4 @@ jobs:
       - name: Push image to GHCR
         if: ${{ secrets.GHCR_TOKEN }}
         run: docker push ghcr.io/${{ github.repository }}/reco:${{ github.sha }}
+
