@@ -1,4 +1,5 @@
-import os, time
+import os
+
 from confluent_kafka import Consumer
 
 conf = {

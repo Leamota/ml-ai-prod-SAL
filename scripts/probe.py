@@ -1,4 +1,7 @@
-import requests, time, random
+import random
+import time
+
+import requests
 
 API_URL = "http://localhost:8080"  # Replace with your live URL later
 

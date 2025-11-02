@@ -1,10 +1,9 @@
 # train.py
 import os
-import pandas as pd
-from surprise import Dataset, Reader, SVD
-from surprise.model_selection import train_test_split
-from surprise import accuracy
 
+import pandas as pd
+from surprise import SVD, Dataset, Reader, accuracy
+from surprise.model_selection import train_test_split
 
 # --- Load MovieLens data safely ---
 data_path = "data/ratings.csv"

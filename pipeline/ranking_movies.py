@@ -1,6 +1,5 @@
 # ranking_movies.py
 import numpy as np
-from surprise import accuracy
 
 
 def precision_recall_at_k(predictions, k=10, threshold=3.5):

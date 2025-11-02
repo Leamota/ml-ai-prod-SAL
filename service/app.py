@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 import os
+
+from fastapi import FastAPI, HTTPException
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 app = FastAPI()
 reqs = Counter("recommend_requests_total", "requests", ["status"])
