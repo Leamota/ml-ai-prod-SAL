@@ -11,23 +11,25 @@ data_path = "data/ratings.csv"
 if os.path.exists(data_path):
     ratings = pd.read_csv(data_path)
 else:
-    ratings = pd.DataFrame({
-        "userId": [1, 2, 3, 4],
-        "movieId": [10, 20, 30, 40],
-        "rating": [4.0, 5.0, 3.5, 4.5]
-    })
+    ratings = pd.DataFrame(
+        {
+            "userId": [1, 2, 3, 4],
+            "movieId": [10, 20, 30, 40],
+            "rating": [4.0, 5.0, 3.5, 4.5],
+        }
+    )
     print("⚠️  Warning: 'data/ratings.csv' not found. Using dummy dataset for testing.")
 
 
 # --- Model 1: Popularity-based ---
-popularity = ratings.groupby('movieId')['rating'].count().sort_values(ascending=False)
+popularity = ratings.groupby("movieId")["rating"].count().sort_values(ascending=False)
 top_movies = popularity.head(10)
 print("Top 10 popular movies by count:\n", top_movies)
 
 
 # --- Model 2: SVD (Collaborative Filtering) ---
 reader = Reader(rating_scale=(0.5, 5))
-data = Dataset.load_from_df(ratings[['userId', 'movieId', 'rating']], reader)
+data = Dataset.load_from_df(ratings[["userId", "movieId", "rating"]], reader)
 trainset, testset = train_test_split(data, test_size=0.2, random_state=42)
 
 svd = SVD()

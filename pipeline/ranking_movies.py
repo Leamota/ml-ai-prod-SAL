@@ -25,8 +25,7 @@ def precision_recall_at_k(predictions, k=10, threshold=3.5):
         n_rel = sum(true_r >= threshold for (_, true_r) in user_ratings)
         n_rec_k = sum(est >= threshold for (est, _) in top_k)
         n_rel_and_rec_k = sum(
-            (true_r >= threshold) and (est >= threshold)
-            for (est, true_r) in top_k
+            (true_r >= threshold) and (est >= threshold) for (est, true_r) in top_k
         )
 
         precisions.append(n_rel_and_rec_k / n_rec_k if n_rec_k else 0)
@@ -54,6 +53,7 @@ def rank_movies():
 # ✅ Run always during pytest import to trigger coverage
 try:
     import sys
+
     if any("pytest" in arg for arg in sys.argv) or "PYTEST_CURRENT_TEST" in globals():
         result = rank_movies()
         print("Ranking movies executed during pytest:", result)
