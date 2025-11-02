@@ -1,0 +1,3 @@
+Model Comparison:
+1. Popularity-Based (simple ranking)
+2. SVD: RMSE=1.000, MAE=1.000
