@@ -17,10 +17,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-<<<<<<< Updated upstream
+
       - run: pip install -r requirements.txt
       - name: Sanity check pytest plugins
-      - run: pytest --version
+        run: pytest --version
 
       - run: pytest --cov=pipeline --cov-report=xml
       - run: flake8 pipeline tests
@@ -31,8 +31,8 @@ jobs:
         run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
       - name: Push Docker image
         run: docker push us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:v14
-=======
->>>>>>> Stashed changes
+
+ 
 
       - name: Install dependencies
         run: pip install -r requirements.txt
