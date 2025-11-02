@@ -28,7 +28,7 @@ jobs:
 
       - name: Run Tests with Coverage
         run: |
-          pytest --cov=pipeline --cov-report=xml --cov-report=term-missing
+          pytest --cov=. --cov-report=xml --cov-report=term-missing
           coverage report --fail-under=70
 
       - name: Lint with flake8
