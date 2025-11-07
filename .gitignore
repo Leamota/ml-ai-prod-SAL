@@ -1,20 +1,42 @@
-# Python
+# ---------------------------
+# 🐍 Python / Environment
+# ---------------------------
 __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+venv/
 .env
 .env.*
-# Jupyter
-.ipynb_checkpoints/
-# OS
-.DS_Store
-Thumbs.db
-# Docker
 *.log
-# Coverage/pytest
+
+# ---------------------------
+# 🧪 Jupyter / Tests / Coverage
+# ---------------------------
+.ipynb_checkpoints/
 .htmlcov/
 .coverage*
+coverage.xml
 .pytest_cache/
 dist/
 build/
+
+# ---------------------------
+# 🗂️ Data & Results (local artifacts)
+# ---------------------------
+data/
+results/
+
+# ---------------------------
+# 💻 OS / IDE Files
+# ---------------------------
+.DS_Store
+Thumbs.db
+
+# ---------------------------
+# 🐋 Docker / Packaging
+# ---------------------------
+*.tar
+*.bak
+*.tmp
+*.out
