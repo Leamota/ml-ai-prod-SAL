@@ -13,6 +13,7 @@ scipy
 scikit-learn
 surprise
 scikit-surprise
+pandera==0.26.1
 
 # Testing & linting
 pytest
