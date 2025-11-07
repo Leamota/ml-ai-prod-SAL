@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run Tests with Coverage
@@ -39,15 +39,19 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -f docker/recommender.Dockerfile \
-            -t us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:${{ github.run_number }} .
+          IMAGE_URI=${{ vars.GCLOUD_REGION }}-docker.pkg.dev/${{ vars.GCLOUD_PROJECT }}/${{ vars.ARTIFACT_REPO }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -f docker/recommender.Dockerfile -t $IMAGE_URI .
 
       - name: Authenticate to Artifact Registry
-        run: echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
+        run: |
+          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
+          gcloud auth activate-service-account --key-file=key.json
+          gcloud config set project ${{ vars.GCLOUD_PROJECT }}
+          gcloud auth configure-docker ${{ vars.GCLOUD_REGION }}-docker.pkg.dev --quiet
 
       - name: Push Docker Image
-        run: |
-          docker push us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:${{ github.run_number }}
+        run: docker push $IMAGE_URI
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4
@@ -67,14 +71,29 @@ jobs:
         run: |
           echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
           gcloud auth activate-service-account --key-file=key.json
-          gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
-          gcloud config set run/region ${{ secrets.GCLOUD_REGION }}
+          gcloud config set project ${{ vars.GCLOUD_PROJECT }}
+          gcloud config set run/region ${{ vars.GCLOUD_REGION }}
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy recommender-api \
-            --image=us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:${{ github.run_number }} \
-            --region=${{ secrets.GCLOUD_REGION }} \
+          IMAGE_URI=${{ vars.GCLOUD_REGION }}-docker.pkg.dev/${{ vars.GCLOUD_PROJECT }}/${{ vars.ARTIFACT_REPO }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}
+          gcloud run deploy ${{ vars.SERVICE_NAME }} \
+            --image=$IMAGE_URI \
+            --region=${{ vars.GCLOUD_REGION }} \
             --allow-unauthenticated \
             --platform=managed \
             --quiet
+
+      - name: Verify Deployment
+        run: |
+          echo "✅ Deployment complete. Service URL:"
+          gcloud run services describe ${{ vars.SERVICE_NAME }} \
+            --region=${{ vars.GCLOUD_REGION }} \
+            --format='value(status.url)'
+
+
+
+
+
+
+
