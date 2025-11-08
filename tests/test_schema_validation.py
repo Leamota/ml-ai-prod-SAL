@@ -1,6 +1,6 @@
 import pandas as pd
 from stream.schema_validation import rating_schema
-import pytest
+
 
 def test_schema_valid():
     df = pd.DataFrame({
