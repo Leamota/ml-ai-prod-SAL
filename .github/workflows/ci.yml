@@ -34,14 +34,28 @@ jobs:
         run: docker build -f docker/recommender.Dockerfile \
           -t ghcr.io/${{ github.repository }}/reco:${{ github.sha }} .
 
-      - name: Login to GHCR (if secret is set)
-        if: env.GHCR_TOKEN != ''
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Login to GHCR
+        if: ${{ secrets.GHCR_TOKEN != '' }}
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Push image to GHCR (if secret is set)
-        if: env.GHCR_TOKEN != ''
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      - name: Push image to GHCR
+        if: ${{ secrets.GHCR_TOKEN != '' }}
         run: docker push ghcr.io/${{ github.repository }}/reco:${{ github.sha }}
+
+      - name: Authenticate with Google Cloud
+        if: ${{ secrets.GCLOUD_SERVICE_KEY != '' }}
+        run: |
+          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
+          gcloud auth activate-service-account --key-file=key.json
+          gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
+          gcloud config set run/region ${{ secrets.GCLOUD_REGION }}
+
+      - name: Deploy to Cloud Run
+        if: ${{ secrets.GCLOUD_SERVICE_KEY != '' }}
+        run: |
+          gcloud run deploy recommender-api \
+            --image=ghcr.io/${{ github.repository }}/reco:${{ github.sha }} \
+            --region=${{ secrets.GCLOUD_REGION }} \
+            --allow-unauthenticated \
+            --platform=managed \
+            --quiet
