@@ -14,10 +14,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set Up Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
@@ -35,50 +35,29 @@ jobs:
       - name: Check Formatting with black
         run: black --check .
 
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
       - name: Build Docker Image
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          docker build -f docker/recommender.Dockerfile \
-            -t ghcr.io/${REPO_NAME}/reco:${{ github.sha }} .
-
-      - name: Login to GHCR
-        if: ${{ env.GHCR_TOKEN != '' }}
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          IMAGE_URI="us-central1-docker.pkg.dev/ml-ai-prod-sal/ml-recs/recommender-api:${{ github.sha }}"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -f docker/recommender.Dockerfile -t $IMAGE_URI .
 
       - name: Push Docker Image
-        if: ${{ env.GHCR_TOKEN != '' }}
-        env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-        run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          docker push ghcr.io/${REPO_NAME}/reco:${{ github.sha }}
-
-      - name: Upload Coverage Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
-
-  deploy:
-    needs: build-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Authenticate with Google Cloud
-        run: |
-          echo "${{ secrets.GCLOUD_SERVICE_KEY }}" | base64 --decode > key.json
-          gcloud auth activate-service-account --key-file=key.json
-          gcloud config set project ${{ secrets.GCLOUD_PROJECT }}
-          gcloud config set run/region ${{ secrets.GCLOUD_REGION }}
+        run: docker push $IMAGE_URI
 
       - name: Deploy to Cloud Run
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           gcloud run deploy recommender-api \
-            --image=ghcr.io/${REPO_NAME}/reco:${{ github.sha }} \
-            --region=${{ secrets.GCLOUD_REGION }} \
+            --image $IMAGE_URI \
+            --region=us-central1 \
+            --project=ml-ai-prod-sal \
             --allow-unauthenticated \
             --platform=managed \
             --quiet
