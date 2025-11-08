@@ -19,14 +19,18 @@ def generate_sample_data():
     """Create small baseline/current samples for demonstration."""
     Path("data").mkdir(exist_ok=True)
     np.random.seed(42)
-    baseline = pd.DataFrame({
-        "age": np.random.normal(30, 5, 1000),
-        "activity_level": np.random.normal(50, 10, 1000),
-    })
-    current = pd.DataFrame({
-        "age": np.random.normal(33, 5, 1000),
-        "activity_level": np.random.normal(48, 12, 1000),
-    })
+    baseline = pd.DataFrame(
+        {
+            "age": np.random.normal(30, 5, 1000),
+            "activity_level": np.random.normal(50, 10, 1000),
+        }
+    )
+    current = pd.DataFrame(
+        {
+            "age": np.random.normal(33, 5, 1000),
+            "activity_level": np.random.normal(48, 12, 1000),
+        }
+    )
     baseline.to_csv(BASELINE_PATH, index=False)
     current.to_csv(CURRENT_PATH, index=False)
 
@@ -58,4 +62,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

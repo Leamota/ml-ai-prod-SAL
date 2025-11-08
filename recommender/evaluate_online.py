@@ -5,7 +5,6 @@ Joins reco_responses with watch events to compute an online KPI proxy.
 
 from pathlib import Path
 import pandas as pd
-import numpy as np
 import json
 
 # Example data source (simulated Kafka topics)
@@ -48,7 +47,11 @@ def compute_kpi(df_reco, df_watch, window_min=TIME_WINDOW_MIN):
         matches = df_watch[
             (df_watch["user_id"] == uid)
             & (df_watch["item_id"] == iid)
-            & (df_watch["watch_ts"] - reco_time).dt.total_seconds().between(0, window_min * 60)
+            & (
+                (df_watch["watch_ts"] - reco_time)
+                .dt.total_seconds()
+                .between(0, window_min * 60)
+            )
         ]
         if not matches.empty:
             success_count += 1
@@ -76,4 +79,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
